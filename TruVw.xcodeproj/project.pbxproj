@@ -25,7 +25,6 @@
 		A1000016 /* BookmarksView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000016 /* BookmarksView.swift */; };
 		A1000017 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000017 /* HistoryView.swift */; };
 		A1000018 /* DownloadsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000018 /* DownloadsView.swift */; };
-
 		A1000020 /* StartPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000020 /* StartPageView.swift */; };
 		A1000021 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A2000021 /* Assets.xcassets */; };
 		A1000022 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000022 /* SettingsView.swift */; };
@@ -33,6 +32,7 @@
 		A1000024 /* ConfigRule.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000024 /* ConfigRule.swift */; };
 		A1000025 /* ConfigManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000025 /* ConfigManager.swift */; };
 		A1000026 /* RuleEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000026 /* RuleEngine.swift */; };
+		A1000027 /* ShareSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000027 /* ShareSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -54,7 +54,6 @@
 		A2000016 /* BookmarksView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookmarksView.swift; sourceTree = "<group>"; };
 		A2000017 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
 		A2000018 /* DownloadsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadsView.swift; sourceTree = "<group>"; };
-
 		A2000020 /* StartPageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartPageView.swift; sourceTree = "<group>"; };
 		A2000021 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A2000022 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -62,6 +61,7 @@
 		A2000024 /* ConfigRule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigRule.swift; sourceTree = "<group>"; };
 		A2000025 /* ConfigManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigManager.swift; sourceTree = "<group>"; };
 		A2000026 /* RuleEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RuleEngine.swift; sourceTree = "<group>"; };
+		A2000027 /* ShareSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareSheet.swift; sourceTree = "<group>"; };
 		A3000001 /* TruVw.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TruVw.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -128,9 +128,9 @@
 				A2000016 /* BookmarksView.swift */,
 				A2000017 /* HistoryView.swift */,
 				A2000018 /* DownloadsView.swift */,
-
 				A2000020 /* StartPageView.swift */,
 				A2000022 /* SettingsView.swift */,
+				A2000027 /* ShareSheet.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -252,13 +252,13 @@
 				A1000016 /* BookmarksView.swift in Sources */,
 				A1000017 /* HistoryView.swift in Sources */,
 				A1000018 /* DownloadsView.swift in Sources */,
-
 				A1000020 /* StartPageView.swift in Sources */,
 				A1000022 /* SettingsView.swift in Sources */,
 				A1000023 /* Extensions.swift in Sources */,
 				A1000024 /* ConfigRule.swift in Sources */,
 				A1000025 /* ConfigManager.swift in Sources */,
 				A1000026 /* RuleEngine.swift in Sources */,
+				A1000027 /* ShareSheet.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -388,17 +388,20 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = UR82T8392M;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TruVw;
 				INFOPLIST_KEY_NSAppTransportSecurity = "<dict><key>NSAllowsArbitraryLoads</key><true/></dict>";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
-				INFOPLIST_KEY_CFBundleDisplayName = TruVw;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xalipan.truvw;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -414,17 +417,20 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = UR82T8392M;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = TruVw;
 				INFOPLIST_KEY_NSAppTransportSecurity = "<dict><key>NSAllowsArbitraryLoads</key><true/></dict>";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
 				MARKETING_VERSION = 1.0;
-				INFOPLIST_KEY_CFBundleDisplayName = TruVw;
 				PRODUCT_BUNDLE_IDENTIFIER = com.xalipan.truvw;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
