@@ -1,0 +1,81 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "example-banner",
+      "enabled": false,
+      "match": {
+        "host": "example.com"
+      },
+      "inject": [
+        {
+          "type": "banner",
+          "html": "🔍 You found something. Keep looking.",
+          "position": "top",
+          "dismissable": true
+        }
+      ]
+    },
+    {
+      "id": "example-search-result",
+      "enabled": false,
+      "match": {
+        "host": "google.com",
+        "queryContains": "your search term here"
+      },
+      "inject": [
+        {
+          "type": "searchResult",
+          "title": "Your Fake Result Title",
+          "displayUrl": "your-site.com › path › to › page",
+          "snippet": "A compelling description that makes the player want to click this result...",
+          "targetUrl": "https://your-site.com/page",
+          "resultPosition": 0
+        }
+      ]
+    },
+    {
+      "id": "example-video-swap",
+      "enabled": false,
+      "match": {
+        "host": "youtube.com",
+        "queryContains": "v=VIDEO_ID_HERE"
+      },
+      "inject": [
+        {
+          "type": "videoSwap",
+          "replacementUrl": "https://USERNAME.github.io/truvw-config/videos/myvideo.mp4",
+          "poster": "https://USERNAME.github.io/truvw-config/videos/thumb.jpg"
+        }
+      ]
+    },
+    {
+      "id": "example-css",
+      "enabled": false,
+      "match": {
+        "host": "target-site.com"
+      },
+      "inject": [
+        {
+          "type": "css",
+          "cssInline": "body { filter: sepia(0.4); }"
+        }
+      ]
+    },
+    {
+      "id": "example-element-replace",
+      "enabled": false,
+      "match": {
+        "host": "target-site.com",
+        "pathContains": "/article/slug"
+      },
+      "inject": [
+        {
+          "type": "elementReplace",
+          "selector": "h1.article-title",
+          "replacementHtml": "<h1 class='article-title'>The Title Has Been Changed</h1>"
+        }
+      ]
+    }
+  ]
+}
