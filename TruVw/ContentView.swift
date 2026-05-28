@@ -1,82 +1,35 @@
 import SwiftUI
-import Combine
-
-// MARK: - Keyboard height observer
-
-/// Publishes the keyboard's visual height above the safe-area bottom.
-/// This is the exact amount we need to pad the toolbar up by.
-final class KeyboardObserver: ObservableObject {
-    @Published var height: CGFloat = 0
-    @Published var animationDuration: Double = 0.25
-
-    private var bag = Set<AnyCancellable>()
-
-    init() {
-        NotificationCenter.default
-            .publisher(for: UIResponder.keyboardWillShowNotification)
-            .sink { [weak self] n in
-                let frame    = n.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect ?? .zero
-                let duration = n.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25
-                let safeBot  = UIApplication.keyWindow?.safeAreaInsets.bottom ?? 0
-                self?.animationDuration = duration
-                withAnimation(.easeOut(duration: duration)) {
-                    self?.height = max(0, frame.height - safeBot)
-                }
-            }
-            .store(in: &bag)
-
-        NotificationCenter.default
-            .publisher(for: UIResponder.keyboardWillHideNotification)
-            .sink { [weak self] n in
-                let duration = n.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? Double ?? 0.25
-                withAnimation(.easeIn(duration: duration)) {
-                    self?.height = 0
-                }
-            }
-            .store(in: &bag)
-    }
-}
 
 // MARK: - Content View
 
 struct ContentView: View {
-    @StateObject private var vm       = BrowserViewModel()
-    @StateObject private var keyboard = KeyboardObserver()
+    @StateObject private var vm = BrowserViewModel()
 
     var body: some View {
-        GeometryReader { geo in
-            ZStack(alignment: .bottom) {
-
-                // ── Full-bleed web content ───────────────────────────
-                ZStack {
-                    ForEach(vm.tabManager.tabs) { tab in
-                        TabContentView(tab: tab, vm: vm)
-                            .opacity(tab.id == vm.tabManager.activeTabID ? 1 : 0)
-                            .allowsHitTesting(tab.id == vm.tabManager.activeTabID)
-                    }
-                }
-                .frame(width: geo.size.width, height: geo.size.height)
-                .ignoresSafeArea()
-
-                // ── Bottom chrome: find-bar + toolbar ────────────────
-                // Sits above the keyboard when it's visible;
-                // sits above the home indicator when it's not.
-                VStack(spacing: 0) {
-                    if vm.showFindInPage {
-                        FindInPageBar(vm: vm)
-                            .transition(.move(edge: .bottom).combined(with: .opacity))
-                    }
-                    SafariBottomBar(vm: vm)
-                }
-                // When the keyboard is showing, lift by its height.
-                // When hidden, still clear the home indicator via
-                // the safe area (handled inside SafariBottomBar).
-                .padding(.bottom, keyboard.height)
+        // The toolbar VStack lives in normal layout flow so SwiftUI's
+        // built-in keyboard avoidance moves it up automatically.
+        // The web content is attached as a .background() — it expands
+        // to fill the screen behind the toolbar without affecting the
+        // layout of the toolbar itself or its safe area handling.
+        VStack(spacing: 0) {
+            Spacer(minLength: 0)
+            if vm.showFindInPage {
+                FindInPageBar(vm: vm)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
             }
-            // Stretch to fill including device safe areas
-            .ignoresSafeArea()
+            SafariBottomBar(vm: vm)
         }
-        .ignoresSafeArea()
+        .background(
+            ZStack {
+                ForEach(vm.tabManager.tabs) { tab in
+                    TabContentView(tab: tab, vm: vm)
+                        .opacity(tab.id == vm.tabManager.activeTabID ? 1 : 0)
+                        .allowsHitTesting(tab.id == vm.tabManager.activeTabID)
+                }
+            }
+            .ignoresSafeArea()
+        )
+        .ignoresSafeArea(.container, edges: .bottom)
         .animation(.easeInOut(duration: 0.18), value: vm.showFindInPage)
         .sheet(isPresented: $vm.showTabGrid) { TabGridView(vm: vm) }
         .sheet(item: $vm.activeSheet) { sheet in
