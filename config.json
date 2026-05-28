@@ -18,10 +18,10 @@
     },
     {
       "id": "example-search-result",
-      "enabled": false,
+      "enabled": true,
       "match": {
         "host": "google.com",
-        "queryContains": "your search term here"
+        "queryContains": "Graham Hancock"
       },
       "inject": [
         {

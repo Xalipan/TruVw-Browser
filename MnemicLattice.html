@@ -1,0 +1,924 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mnemic Lattice</title>
+    <style>
+        :root {
+            --primary-dark: #0a1929;
+            --secondary-dark: #1a365d;
+            --accent-blue: #2d74da;
+            --accent-teal: #2dd4bf;
+            --text-light: #e2e8f0;
+            --text-muted: #94a3b8;
+            --warning: #dc2626;
+            --success: #059669;
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: var(--primary-dark);
+            color: var(--text-light);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+
+        header {
+            border-bottom: 1px solid var(--secondary-dark);
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+
+        .site-title {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-teal));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+        }
+
+
+        .subtitle {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+
+
+        .sidebar {
+            background: var(--secondary-dark);
+            border-radius: 8px;
+            padding: 20px;
+            height: fit-content;
+        }
+
+
+        .archive-tree {
+            font-family: monospace;
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+
+
+        .tree-item {
+            padding: 4px 0;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+
+        .tree-item:hover {
+            color: var(--accent-teal);
+        }
+
+
+        .tree-item.locked {
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+
+        .tree-item.unlocked {
+            color: var(--success);
+        }
+
+
+        .code-input-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+
+        .code-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--accent-blue);
+            border-radius: 4px;
+            color: white;
+            font-family: monospace;
+            font-size: 1rem;
+            margin: 10px 0;
+        }
+
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+
+        .btn-primary:hover {
+            background: #1e60c5;
+        }
+
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+
+        .content-area {
+            min-height: 500px;
+        }
+
+
+        .content-view {
+            background: var(--secondary-dark);
+            border-radius: 8px;
+            padding: 30px;
+            min-height: 600px;
+            display: none;
+        }
+
+
+        .content-view.active {
+            display: block;
+        }
+
+
+        .novel-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+
+        .footnote {
+            color: var(--accent-teal);
+            cursor: pointer;
+            text-decoration: underline dotted;
+            position: relative;
+        }
+
+
+        .footnote:hover::after {
+            content: attr(data-code);
+            position: absolute;
+            background: rgba(0,0,0,0.9);
+            padding: 5px;
+            border-radius: 3px;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 100;
+        }
+
+
+        .glossary-entry {
+            border-left: 3px solid var(--accent-blue);
+            padding-left: 15px;
+            margin: 20px 0;
+        }
+
+
+        .map-container {
+            position: relative;
+            margin: 20px 0;
+        }
+
+
+        .map-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+
+        .map-layer.active {
+            opacity: 1;
+        }
+
+
+        .layer-controls {
+            margin: 10px 0;
+        }
+
+
+        .progress-bar {
+            height: 4px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-teal));
+            width: 0%;
+            transition: width 0.5s;
+        }
+
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            background: var(--success);
+            color: white;
+            border-radius: 4px;
+            transform: translateX(150%);
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+
+        .document-view {
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 4px;
+            margin: 10px 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+
+        .spoiler-text {
+            background: black;
+            color: black;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+
+
+        .spoiler-text.revealed {
+            background: transparent;
+            color: inherit;
+        }
+
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-top: 1px solid var(--secondary-dark);
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+
+        .era-toggle {
+            padding: 8px 16px;
+            background: var(--secondary-dark);
+            border: 1px solid var(--accent-blue);
+            border-radius: 4px;
+            color: var(--text-light);
+            cursor: pointer;
+        }
+
+
+        .document-meta {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="site-title">MNEMIC LATTICE</h1>
+            <p class="subtitle">Progressive Reality-Shifting Repository v0.1</p>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="status-bar">
+                <span>ERA: <span id="currentEra">XALIPANEC</span></span>
+                <span>UNLOCKED: <span id="unlockedCount">0</span>/247</span>
+                <button class="era-toggle" onclick="toggleEra()">TOGGLE ERA VIEW</button>
+            </div>
+        </header>
+
+
+        <div class="main-grid">
+            <!-- Sidebar with Archive Tree -->
+            <div class="sidebar">
+                <h3>LATTICE STRUCTURE</h3>
+                <div class="archive-tree" id="archiveTree">
+                    <!-- Populated by JavaScript -->
+                </div>
+
+
+                <div class="code-input-section">
+                    <h3>ENTER CODE</h3>
+                    <input type="text" class="code-input" id="codeInput" placeholder="[KA.CULT.PERS.YT.003]">
+                    <button class="btn btn-primary" onclick="processCode()">UNLOCK CONTENT</button>
+                    <button class="btn" onclick="resetProgress()" style="margin-top: 10px; background: var(--warning);">RESET PROGRESS</button>
+                </div>
+
+
+                <div style="margin-top: 30px; font-size: 0.8rem; color: var(--text-muted);">
+                    <p>Status: <span id="archiveStatus">LOCKED (Requires Book Code)</span></p>
+                    <p>Current Access Level: <span id="accessLevel">0</span></p>
+                </div>
+            </div>
+
+
+            <!-- Main Content Area -->
+            <div class="content-area">
+                <!-- Landing Page (Level 0) -->
+                <div class="content-view active" id="landingView">
+                    <h2>ACCESS DENIED</h2>
+                    <p>The Mnemic Lattice is currently locked.</p>
+                    <p>To gain access, please enter your book purchase code:</p>
+                    <input type="text" class="code-input" id="purchaseCode" placeholder="BOOK-XXXX-XXXX-XXXX">
+                    <button class="btn btn-success" onclick="activateArchive()">ACTIVATE</button>
+                    
+                    <div style="margin-top: 40px; border-top: 1px solid var(--secondary-dark); padding-top: 20px;">
+                        <h3>TEASER CONTENT</h3>
+                        <p>This archive contains classified documents from the Xalipanec era, including:</p>
+                        <ul style="margin-left: 20px; margin-top: 10px;">
+                            <li>Full narrative accounts with audiobook integration</li>
+                            <li>Olvax operational files (classified)</li>
+                            <li>Cerulean technical specifications</li>
+                            <li>Cultural artifacts and Yanetz's codex</li>
+                            <li>Dynamic reference materials</li>
+                        </ul>
+                        <p style="margin-top: 20px; font-style: italic;">
+                            "Reality is not what it seems. Or rather, it is not only what it seems."
+                        </p>
+                    </div>
+                </div>
+
+
+                <!-- Novel Reader View -->
+                <div class="content-view" id="novelView">
+                    <h2>NARRATIVE ACCOUNTS</h2>
+                    <div class="novel-text" id="novelContent">
+                        <!-- Novel content loaded here -->
+                    </div>
+                </div>
+
+
+                <!-- Document Viewer -->
+                <div class="content-view" id="documentView">
+                    <h2 id="docTitle">DOCUMENT</h2>
+                    <div class="document-meta" id="docMeta">
+                        Classification: <span id="docClassification">UNCLASSIFIED</span>
+                    </div>
+                    <div class="document-view" id="docContent">
+                        <!-- Document content loaded here -->
+                    </div>
+                </div>
+
+
+                <!-- Glossary Viewer -->
+                <div class="content-view" id="glossaryView">
+                    <h2>GLOSSARY</h2>
+                    <div id="glossaryContent">
+                        <!-- Glossary entries loaded here -->
+                    </div>
+                </div>
+
+
+                <!-- Map Viewer -->
+                <div class="content-view" id="mapView">
+                    <h2>CARTOGRAPHIC RECORDS</h2>
+                    <div class="layer-controls">
+                        <button onclick="switchMapLayer('xalipan')" class="btn">XALIPAN ERA</button>
+                        <button onclick="switchMapLayer('aviva')" class="btn" id="avivaBtn" disabled>AVIVA ERA</button>
+                        <button onclick="switchMapLayer('overlay')" class="btn">TOPOGRAPHICAL OVERLAY</button>
+                    </div>
+                    <div class="map-container">
+                        <!-- Map will be drawn here -->
+                        <canvas id="mapCanvas" width="800" height="500" style="background: #1a365d; border-radius: 4px;"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="notification" id="notification">
+            Content unlocked successfully!
+        </div>
+    </div>
+
+
+    <script>
+        // ============================
+        // DATA STRUCTURES
+        // ============================
+
+
+        const archiveData = {
+            status: 'locked', // 'locked', 'active', 'generation_revealed'
+            accessLevel: 0,
+            unlockedCodes: new Set(),
+            currentEra: 'xalipanec',
+            chapterProgress: 0,
+            documents: {},
+            glossary: {},
+            maps: {}
+        };
+
+
+        // Mock document database (in a real app, this would be loaded from files)
+        const documentDatabase = {
+            "KA.CULT.PERS.YT.001": {
+                title: "Personal Journal - Yanetz T'sfr",
+                content: "The city breathes differently today. The resonance in Sector 7 has shifted by 0.3 degrees... <span class='spoiler-text' onclick='revealSpoiler(this)'>[REDACTED: Rollback Reference]</span>",
+                classification: "CULTURAL/PERSONAL",
+                requires: [],
+                unlocks: ["KA.CULT.PERS.YT.002"],
+                era: "xalipanec"
+            },
+            "KA.OLVX.OP.001": {
+                title: "Operation Whitefall - Initial Briefing",
+                content: "Operatives are to monitor dimensional resonance in the Axiom District. Report any fluctuations exceeding 4.7 on the Kaelin Scale.",
+                classification: "OLVAX/OPERATIONAL",
+                requires: ["CHAPTER_3"],
+                unlocks: [],
+                era: "xalipanec"
+            }
+        };
+
+
+        // Mock glossary entries
+        const glossaryDatabase = {
+            "Hēra Tksfr": {
+                base: "Head Archivist of the Mnemonic Division",
+                expanded: "Head Archivist of the Mnemonic Division / Clara Pensafar / Laura",
+                era: "xalipanec",
+                requires: ["KA.CULT.PERS.YT.003"]
+            },
+            "Reephaze": {
+                base: "Cognitive synchronization event",
+                expanded: "Generational reality synchronization event",
+                era: "xalipanec",
+                requires: ["CHAPTER_15"]
+            }
+        };
+
+
+        // ============================
+        // INITIALIZATION
+        // ============================
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProgress();
+            renderArchiveTree();
+            updateUI();
+            drawMap();
+        });
+
+
+        // ============================
+        // CORE FUNCTIONS
+        // ============================
+
+
+        function loadProgress() {
+            const saved = localStorage.getItem('mnemonicArchive');
+            if (saved) {
+                const data = JSON.parse(saved);
+                archiveData.status = data.status || 'locked';
+                archiveData.accessLevel = data.accessLevel || 0;
+                archiveData.unlockedCodes = new Set(data.unlockedCodes || []);
+                archiveData.currentEra = data.currentEra || 'xalipanec';
+                archiveData.chapterProgress = data.chapterProgress || 0;
+            }
+        }
+
+
+        function saveProgress() {
+            const data = {
+                status: archiveData.status,
+                accessLevel: archiveData.accessLevel,
+                unlockedCodes: Array.from(archiveData.unlockedCodes),
+                currentEra: archiveData.currentEra,
+                chapterProgress: archiveData.chapterProgress
+            };
+            localStorage.setItem('mnemonicArchive', JSON.stringify(data));
+        }
+
+
+        function activateArchive() {
+            const code = document.getElementById('purchaseCode').value;
+            if (code && code.startsWith('BOOK-')) {
+                archiveData.status = 'active';
+                archiveData.accessLevel = 1;
+                saveProgress();
+                updateUI();
+                showNotification('Archive activated! Level 1 access granted.');
+                showContent('novelView');
+                loadNovelChapter(1);
+            } else {
+                alert('Invalid purchase code. Format: BOOK-XXXX-XXXX-XXXX');
+            }
+        }
+
+
+        function processCode() {
+            const codeInput = document.getElementById('codeInput');
+            const code = codeInput.value.trim().toUpperCase();
+            
+            if (!code) return;
+            
+            // Validate code format
+            if (!code.match(/^\[?KA\.\w+\.\w+(\.\w+)*\.\d{3}\]?$/)) {
+                showNotification('Invalid code format. Expected: KA.CATEGORY.SUBCAT.XXX.001', true);
+                return;
+            }
+            
+            // Clean code
+            const cleanCode = code.replace(/[\[\]]/g, '');
+            
+            if (archiveData.unlockedCodes.has(cleanCode)) {
+                showNotification('Code already unlocked', true);
+                return;
+            }
+            
+            // Check dependencies
+            const doc = documentDatabase[cleanCode];
+            if (doc && doc.requires.length > 0) {
+                const unmet = doc.requires.filter(req => {
+                    if (req.startsWith('CHAPTER_')) {
+                        const chapterNum = parseInt(req.split('_')[1]);
+                        return archiveData.chapterProgress < chapterNum;
+                    }
+                    return !archiveData.unlockedCodes.has(req);
+                });
+                
+                if (unmet.length > 0) {
+                    showNotification(`Prerequisites not met: ${unmet.join(', ')}`, true);
+                    return;
+                }
+            }
+            
+            // Unlock code
+            archiveData.unlockedCodes.add(cleanCode);
+            
+            // Auto-unlock prerequisites (simple dependency system)
+            if (doc && doc.unlocks) {
+                doc.unlocks.forEach(unlockCode => {
+                    if (!archiveData.unlockedCodes.has(unlockCode)) {
+                        archiveData.unlockedCodes.add(unlockCode);
+                    }
+                });
+            }
+            
+            // Check for era shift
+            if (cleanCode === 'GENERATION_REVEALED') {
+                archiveData.currentEra = 'aviva';
+                archiveData.status = 'generation_revealed';
+                showNotification('ERA SHIFT DETECTED: Xalipan → Aviva');
+            }
+            
+            saveProgress();
+            updateUI();
+            showNotification('New content unlocked!');
+            
+            // Auto-open unlocked document
+            if (doc) {
+                showDocument(cleanCode);
+            }
+            
+            codeInput.value = '';
+        }
+
+
+        // ============================
+        // UI FUNCTIONS
+        // ============================
+
+
+        function updateUI() {
+            const unlockedCount = archiveData.unlockedCodes.size;
+            const progress = (unlockedCount / 247) * 100;
+            
+            document.getElementById('progressFill').style.width = `${progress}%`;
+            document.getElementById('unlockedCount').textContent = unlockedCount;
+            document.getElementById('currentEra').textContent = archiveData.currentEra.toUpperCase();
+            document.getElementById('accessLevel').textContent = archiveData.accessLevel;
+            
+            const statusText = archiveData.status === 'locked' ? 'LOCKED (Requires Book Code)' :
+                              archiveData.status === 'generation_revealed' ? 'FULL ACCESS (Aviva Era)' :
+                              'ACTIVE (Xalipan Era)';
+            document.getElementById('archiveStatus').textContent = statusText;
+            
+            // Update archive tree
+            renderArchiveTree();
+            
+            // Update map button availability
+            document.getElementById('avivaBtn').disabled = archiveData.currentEra !== 'aviva';
+        }
+
+
+        function renderArchiveTree() {
+            const tree = document.getElementById('archiveTree');
+            tree.innerHTML = '';
+            
+            const structure = {
+                "ROOT/": {
+                    "NARRATIVE_ACCOUNTS/": archiveData.accessLevel > 0 ? "unlocked" : "locked",
+                    "OLVAX_ARCHIVE/": hasCodeCategory('OLVX') ? "unlocked" : "locked",
+                    "CERULEAN_ARCHIVE/": hasCodeCategory('CERU') ? "unlocked" : "locked",
+                    "CULTURAL_ARCHIVE/": hasCodeCategory('CULT') ? "unlocked" : "locked",
+                    "HISTORICAL_RECORDS/": hasCodeCategory('HIST') ? "unlocked" : "locked",
+                    "REFERENCE_MATERIALS/": archiveData.accessLevel > 0 ? "unlocked" : "locked"
+                }
+            };
+            
+            for (const [folder, contents] of Object.entries(structure)) {
+                const folderDiv = document.createElement('div');
+                folderDiv.className = 'tree-item';
+                folderDiv.textContent = folder;
+                tree.appendChild(folderDiv);
+                
+                if (typeof contents === 'object') {
+                    for (const [subfolder, status] of Object.entries(contents)) {
+                        const subDiv = document.createElement('div');
+                        subDiv.className = `tree-item ${status}`;
+                        subDiv.textContent = `  ├── ${subfolder}`;
+                        subDiv.style.paddingLeft = '20px';
+                        
+                        if (status === 'unlocked') {
+                            subDiv.onclick = () => navigateToFolder(subfolder.replace('/', ''));
+                        }
+                        
+                        tree.appendChild(subDiv);
+                    }
+                }
+            }
+        }
+
+
+        function hasCodeCategory(category) {
+            for (const code of archiveData.unlockedCodes) {
+                if (code.includes(`.${category}.`)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+
+        function showContent(viewId) {
+            document.querySelectorAll('.content-view').forEach(view => {
+                view.classList.remove('active');
+            });
+            document.getElementById(viewId).classList.add('active');
+        }
+
+
+        function showDocument(code) {
+            const doc = documentDatabase[code];
+            if (!doc) {
+                showNotification('Document not found in database', true);
+                return;
+            }
+            
+            document.getElementById('docTitle').textContent = doc.title;
+            document.getElementById('docClassification').textContent = doc.classification;
+            document.getElementById('docContent').innerHTML = doc.content;
+            showContent('documentView');
+        }
+
+
+        function loadNovelChapter(chapter) {
+            const content = document.getElementById('novelContent');
+            // Mock novel content with footnotes
+            content.innerHTML = `
+                <h3>Chapter ${chapter}</h3>
+                <p>The archive doors hissed open, revealing corridors that seemed to stretch into infinity. Hēra Tksfr<sup class="footnote" data-code="KA.CULT.PERS.YT.001" onclick="enterCodeFromFootnote('KA.CULT.PERS.YT.001')">[1]</sup> adjusted her resonance goggles.</p>
+                <p>"The readings are off," she murmured, her fingers tracing patterns in the air. "Sector 7 shows anomalies consistent with pre-Reephaze fluctuations<sup class="footnote" data-code="KA.OLVX.OP.001" onclick="enterCodeFromFootnote('KA.OLVX.OP.001')">[2]</sup>."</p>
+                <p>The walls themselves seemed to pulse with a faint cerulean light<sup class="footnote" data-code="KA.CERU.TECH.001" onclick="enterCodeFromFootnote('KA.CERU.TECH.001')">[3]</sup>, a color that shouldn't exist in this era.</p>
+                <div style="margin-top: 40px;">
+                    <button class="btn" onclick="loadNovelChapter(${chapter - 1})" ${chapter <= 1 ? 'disabled' : ''}>Previous Chapter</button>
+                    <button class="btn" onclick="loadNovelChapter(${chapter + 1})">Next Chapter</button>
+                    <button class="btn" onclick="updateChapterProgress(${chapter})">Mark as Read</button>
+                </div>
+            `;
+            showContent('novelView');
+        }
+
+
+        function enterCodeFromFootnote(code) {
+            document.getElementById('codeInput').value = `[${code}]`;
+            processCode();
+        }
+
+
+        function updateChapterProgress(chapter) {
+            if (chapter > archiveData.chapterProgress) {
+                archiveData.chapterProgress = chapter;
+                saveProgress();
+                showNotification(`Chapter ${chapter} completed! New documents may be available.`);
+            }
+        }
+
+
+        function toggleEra() {
+            if (archiveData.status === 'generation_revealed') {
+                archiveData.currentEra = archiveData.currentEra === 'xalipanec' ? 'aviva' : 'xalipanec';
+                saveProgress();
+                updateUI();
+                showNotification(`Switched to ${archiveData.currentEra.toUpperCase()} era view`);
+                
+                // Update glossary and map if those views are open
+                if (document.getElementById('glossaryView').classList.contains('active')) {
+                    showGlossary();
+                }
+                if (document.getElementById('mapView').classList.contains('active')) {
+                    drawMap();
+                }
+            } else {
+                showNotification('ERA shift not yet unlocked', true);
+            }
+        }
+
+
+        function navigateToFolder(folder) {
+            switch(folder) {
+                case 'NARRATIVE_ACCOUNTS':
+                    loadNovelChapter(1);
+                    break;
+                case 'REFERENCE_MATERIALS':
+                    showGlossary();
+                    break;
+                default:
+                    showNotification(`${folder} contains ${countDocumentsInCategory(folder)} documents`, false, 3000);
+            }
+        }
+
+
+        function showGlossary() {
+            const content = document.getElementById('glossaryContent');
+            let html = '';
+            
+            for (const [term, data] of Object.entries(glossaryDatabase)) {
+                const isExpanded = data.requires.every(req => archiveData.unlockedCodes.has(req));
+                const displayText = isExpanded ? data.expanded : data.base;
+                
+                html += `
+                    <div class="glossary-entry">
+                        <h4>${term}</h4>
+                        <p>${displayText}</p>
+                        ${!isExpanded ? `<small style="color: var(--text-muted);">Additional definitions locked</small>` : ''}
+                    </div>
+                `;
+            }
+            
+            content.innerHTML = html;
+            showContent('glossaryView');
+        }
+
+
+        function drawMap() {
+            const canvas = document.getElementById('mapCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.fillStyle = '#1a365d';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw base map (Xalipan)
+            ctx.fillStyle = archiveData.currentEra === 'xalipanec' ? '#2d74da' : '#1e4d8c';
+            drawCityDistricts(ctx);
+            
+            // If Aviva era is unlocked, add overlay
+            if (archiveData.currentEra === 'aviva') {
+                ctx.fillStyle = 'rgba(45, 212, 191, 0.3)';
+                drawAvivaOverlay(ctx);
+            }
+            
+            // Add labels
+            ctx.fillStyle = 'white';
+            ctx.font = '12px monospace';
+            ctx.fillText(`MAP OF ${archiveData.currentEra.toUpperCase()}`, 20, 30);
+            ctx.fillText('Sector 7', 150, 150);
+            ctx.fillText('Axiom District', 300, 250);
+            ctx.fillText('Archive Core', 400, 350);
+        }
+
+
+        function drawCityDistricts(ctx) {
+            // Simplified district drawing
+            ctx.beginPath();
+            ctx.rect(100, 100, 200, 150); // Sector 7
+            ctx.rect(250, 200, 150, 100); // Axiom District
+            ctx.rect(350, 300, 100, 100); // Archive Core
+            ctx.fill();
+        }
+
+
+        function drawAvivaOverlay(ctx) {
+            ctx.beginPath();
+            ctx.rect(120, 120, 160, 130); // Shifted districts
+            ctx.rect(270, 220, 130, 80);
+            ctx.rect(370, 320, 80, 80);
+            ctx.fill();
+        }
+
+
+        function switchMapLayer(layer) {
+            // In a full implementation, this would switch map visualizations
+            showNotification(`Showing ${layer} layer`);
+        }
+
+
+        function showNotification(message, isError = false, duration = 3000) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.style.background = isError ? 'var(--warning)' : 'var(--success)';
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, duration);
+        }
+
+
+        function revealSpoiler(element) {
+            element.classList.add('revealed');
+        }
+
+
+        function resetProgress() {
+            if (confirm('Are you sure you want to reset all progress? This cannot be undone.')) {
+                localStorage.removeItem('mnemonicArchive');
+                location.reload();
+            }
+        }
+
+
+        // Helper function
+        function countDocumentsInCategory(category) {
+            let count = 0;
+            for (const code of archiveData.unlockedCodes) {
+                if (code.toLowerCase().includes(category.toLowerCase().slice(0, 4))) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+
+        // Initialize with some demo data
+        window.demoUnlock = function() {
+            // For demo purposes, add some codes
+            archiveData.status = 'active';
+            archiveData.accessLevel = 1;
+            archiveData.unlockedCodes.add('KA.CULT.PERS.YT.001');
+            archiveData.unlockedCodes.add('KA.OLVX.OP.001');
+            saveProgress();
+            updateUI();
+            showNotification('Demo codes added');
+        };
+    </script>
+</body>
+</html>
