@@ -16,6 +16,7 @@ class BrowserViewModel: ObservableObject {
 
     @Published var activeSheet: BrowserSheet?
     @Published var showTabGrid = false
+    @Published var showShareSheet = false
     @Published var isPrivateMode = false
     @Published var searchText = ""
     @Published var isEditingAddress = false
