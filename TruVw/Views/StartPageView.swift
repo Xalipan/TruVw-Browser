@@ -88,7 +88,7 @@ struct StartPageView: View {
 
                 Spacer(minLength: 40)
             }
-            .padding(.top, 24)
+            .padding(.top, (UIApplication.keyWindow?.safeAreaInsets.top ?? 44) + 12)
         }
         .background(Color(.systemGroupedBackground))
     }

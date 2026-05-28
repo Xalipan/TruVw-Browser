@@ -5,6 +5,7 @@ struct AddressBarView: View {
     @State private var inputText = ""
     @FocusState private var isFocused: Bool
 
+    // Shows cleaned host in idle mode (no www., no scheme)
     private var idleLabel: String {
         guard let url = vm.currentURL else { return "Search or Enter Website Name" }
         let host = url.host ?? url.absoluteString
@@ -21,44 +22,42 @@ struct AddressBarView: View {
                         vm.isEditingAddress = true
                         isFocused = true
                     } label: {
-                        HStack(spacing: 5) {
-                            if let url = vm.currentURL {
-                                Image(systemName: url.scheme == "https" ? "lock.fill" : "lock.open.fill")
-                                    .font(.system(size: 11, weight: .medium))
-                                    .foregroundColor(url.scheme == "https" ? Color(.secondaryLabel) : .orange)
-                            } else {
-                                Image(systemName: "magnifyingglass")
-                                    .font(.system(size: 12, weight: .medium))
-                                    .foregroundColor(Color(.secondaryLabel))
-                            }
+                        HStack(spacing: 0) {
+                            // Centered label — no lock icon (no reader-mode clutter)
                             Text(idleLabel)
                                 .font(.system(size: 15))
-                                .foregroundColor(vm.currentURL == nil ? Color(.secondaryLabel) : Color(.label))
+                                .foregroundColor(
+                                    vm.currentURL == nil
+                                        ? Color(.secondaryLabel)
+                                        : Color(.label)
+                                )
                                 .lineLimit(1)
-                            Spacer(minLength: 0)
-                            Button {
-                                if vm.isLoading { vm.stopLoading() } else { vm.reload() }
-                            } label: {
-                                Image(systemName: vm.isLoading ? "xmark" : "arrow.clockwise")
-                                    .font(.system(size: 13, weight: .medium))
-                                    .foregroundColor(Color(.secondaryLabel))
-                            }
-                            .disabled(vm.currentURL == nil && !vm.isLoading)
+                                .frame(maxWidth: .infinity, alignment: .center)
                         }
-                        .padding(.horizontal, 10)
-                        .frame(maxWidth: .infinity, minHeight: 34)
-                        .background(Color(.secondarySystemBackground))
-                        .cornerRadius(9)
+                        .padding(.horizontal, 12)
+                        .frame(maxWidth: .infinity, minHeight: 44)
+                        .background(.ultraThinMaterial, in: Capsule())
+                        .overlay(
+                            Capsule()
+                                .strokeBorder(Color.white.opacity(0.18), lineWidth: 0.5)
+                        )
+                        // Progress bar at the bottom of the capsule
                         .overlay(alignment: .bottom) {
                             if vm.isLoading && vm.estimatedProgress > 0 {
                                 GeometryReader { geo in
-                                    Rectangle()
-                                        .fill(Color.blue.opacity(0.5))
-                                        .frame(width: geo.size.width * vm.estimatedProgress, height: 2)
-                                        .animation(.linear(duration: 0.08), value: vm.estimatedProgress)
+                                    Capsule()
+                                        .fill(Color.blue.opacity(0.55))
+                                        .frame(
+                                            width: geo.size.width * vm.estimatedProgress,
+                                            height: 3
+                                        )
+                                        .animation(
+                                            .linear(duration: 0.08),
+                                            value: vm.estimatedProgress
+                                        )
                                 }
-                                .frame(height: 2)
-                                .cornerRadius(1)
+                                .frame(height: 3)
+                                .clipShape(Capsule())
                             }
                         }
                     }
@@ -66,10 +65,11 @@ struct AddressBarView: View {
 
                 // ── Edit field ───────────────────────────────────────
                 } else {
-                    HStack(spacing: 6) {
+                    HStack(spacing: 8) {
                         Image(systemName: "magnifyingglass")
-                            .font(.system(size: 13))
+                            .font(.system(size: 14, weight: .medium))
                             .foregroundColor(Color(.secondaryLabel))
+
                         TextField("Search or Enter Website Name", text: $inputText)
                             .font(.system(size: 15))
                             .keyboardType(.webSearch)
@@ -79,10 +79,12 @@ struct AddressBarView: View {
                             .submitLabel(.go)
                             .onSubmit { vm.navigate(to: inputText) }
                             .onAppear {
+                                // Small delay lets the focus system settle
                                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
                                     isFocused = true
                                 }
                             }
+
                         if !inputText.isEmpty {
                             Button { inputText = "" } label: {
                                 Image(systemName: "xmark.circle.fill")
@@ -91,15 +93,15 @@ struct AddressBarView: View {
                             }
                         }
                     }
-                    .padding(.horizontal, 10)
-                    .frame(maxWidth: .infinity, minHeight: 34)
-                    .background(Color(.secondarySystemBackground))
-                    .cornerRadius(9)
+                    .padding(.horizontal, 12)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .background(.ultraThinMaterial, in: Capsule())
+                    .overlay(Capsule().strokeBorder(Color.blue.opacity(0.5), lineWidth: 1))
                 }
             }
             .frame(maxWidth: .infinity)
 
-            // Cancel button slides in when editing
+            // Cancel slides in when editing
             if vm.isEditingAddress {
                 Button("Cancel") {
                     vm.isEditingAddress = false
@@ -116,4 +118,3 @@ struct AddressBarView: View {
         }
     }
 }
-
