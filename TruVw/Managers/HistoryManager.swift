@@ -9,6 +9,19 @@ class HistoryManager: ObservableObject {
 
     init() {
         load()
+        seedDefaultsIfNeeded()
+    }
+
+    private func seedDefaultsIfNeeded() {
+        guard items.isEmpty else { return }
+        let url = URL(string: "https://www.google.com/search?q=Graham+Hancock")!
+        let item = HistoryItem(
+            title: "Graham Hancock - Google Search",
+            url: url,
+            visitDate: Date().addingTimeInterval(-3600) // 1 hour ago
+        )
+        items = [item]
+        save()
     }
 
     func record(title: String, url: URL) {

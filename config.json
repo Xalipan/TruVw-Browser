@@ -1,6 +1,34 @@
 {
-  "version": 1,
+  "version": 2,
   "rules": [
+    {
+      "id": "graham-hancock-search-css",
+      "enabled": true,
+      "match": {
+        "host": "google.com",
+        "queryContains": "Graham+Hancock"
+      },
+      "inject": [
+        {
+          "type": "css",
+          "cssInline": "body::after { content: ''; position: fixed; bottom: 24px; left: 24px; width: 72px; height: 72px; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Blank_compass.svg/240px-Blank_compass.svg.png'); background-size: contain; background-repeat: no-repeat; opacity: 0.18; z-index: 999999; pointer-events: none; }"
+        }
+      ]
+    },
+    {
+      "id": "graham-hancock-search-bold",
+      "enabled": true,
+      "match": {
+        "host": "google.com",
+        "queryContains": "Graham+Hancock"
+      },
+      "inject": [
+        {
+          "type": "script",
+          "js": "(function() { var BOLD = ['author','ancient','civilization','mystery','consciousness','banned','lecture','evidence','forbidden','archaeology','pyramid','flood','myth','sacred','knowledge']; function boldTerms(root) { var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null); var nodes = []; var n; while(n = walker.nextNode()) nodes.push(n); nodes.forEach(function(node) { if (!node.parentNode || node.parentNode.nodeName === 'SCRIPT' || node.parentNode.nodeName === 'STYLE') return; var html = node.textContent; var changed = false; BOLD.forEach(function(term) { var re = new RegExp('\\\\b(' + term + ')\\\\b', 'gi'); if (re.test(html)) { html = html.replace(re, '<strong>$1</strong>'); changed = true; } }); if (changed) { var span = document.createElement('span'); span.innerHTML = html; node.parentNode.replaceChild(span, node); } }); } boldTerms(document.body); var obs = new MutationObserver(function(muts) { muts.forEach(function(m) { m.addedNodes.forEach(function(n) { if (n.nodeType === 1) boldTerms(n); }); }); }); obs.observe(document.body, {childList:true, subtree:true}); })();"
+        }
+      ]
+    },
     {
       "id": "example-banner",
       "enabled": false,
@@ -17,24 +45,6 @@
       ]
     },
     {
-      "id": "example-search-result",
-      "enabled": true,
-      "match": {
-        "host": "google.com",
-        "queryContains": "Graham Hancock"
-      },
-      "inject": [
-        {
-          "type": "searchResult",
-          "title": "Your Fake Result Title",
-          "displayUrl": "your-site.com › path › to › page",
-          "snippet": "A compelling description that makes the player want to click this result...",
-          "targetUrl": "https://your-site.com/page",
-          "resultPosition": 0
-        }
-      ]
-    },
-    {
       "id": "example-video-swap",
       "enabled": false,
       "match": {
@@ -46,34 +56,6 @@
           "type": "videoSwap",
           "replacementUrl": "https://USERNAME.github.io/truvw-config/videos/myvideo.mp4",
           "poster": "https://USERNAME.github.io/truvw-config/videos/thumb.jpg"
-        }
-      ]
-    },
-    {
-      "id": "example-css",
-      "enabled": false,
-      "match": {
-        "host": "target-site.com"
-      },
-      "inject": [
-        {
-          "type": "css",
-          "cssInline": "body { filter: sepia(0.4); }"
-        }
-      ]
-    },
-    {
-      "id": "example-element-replace",
-      "enabled": false,
-      "match": {
-        "host": "target-site.com",
-        "pathContains": "/article/slug"
-      },
-      "inject": [
-        {
-          "type": "elementReplace",
-          "selector": "h1.article-title",
-          "replacementHtml": "<h1 class='article-title'>The Title Has Been Changed</h1>"
         }
       ]
     }

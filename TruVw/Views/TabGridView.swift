@@ -69,56 +69,64 @@ struct TabCard: View {
     let onClose: () -> Void
 
     var body: some View {
-        Button(action: onSelect) {
-            VStack(spacing: 0) {
-                // Header bar
-                HStack {
-                    AsyncFaviconView(url: tab.url)
-                        .frame(width: 16, height: 16)
-                        .cornerRadius(3)
-                    Text(tab.title.isEmpty ? "New Tab" : tab.title)
-                        .font(.system(size: 12, weight: .medium))
-                        .lineLimit(1)
-                        .foregroundColor(.primary)
-                    Spacer()
-                    Button(action: onClose) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundColor(.secondary)
-                            .padding(4)
+        ZStack(alignment: .topTrailing) {
+            // Card tap area
+            Button(action: onSelect) {
+                VStack(spacing: 0) {
+                    // Header bar (no close button here)
+                    HStack {
+                        AsyncFaviconView(url: tab.url)
+                            .frame(width: 16, height: 16)
+                            .cornerRadius(3)
+                        Text(tab.title.isEmpty ? "New Tab" : tab.title)
+                            .font(.system(size: 12, weight: .medium))
+                            .lineLimit(1)
+                            .foregroundColor(.primary)
+                        Spacer()
+                        // Spacer to reserve room for the close button overlay
+                        Color.clear.frame(width: 28, height: 28)
                     }
-                }
-                .padding(.horizontal, 8)
-                .padding(.vertical, 6)
-                .background(Color(.secondarySystemBackground))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 6)
+                    .background(Color(.secondarySystemBackground))
 
-                // Snapshot preview
-                Group {
-                    if let snapshot = tab.snapshot {
-                        Image(uiImage: snapshot)
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    } else {
-                        Rectangle()
-                            .fill(Color(.systemBackground))
-                            .overlay(
-                                Image(systemName: "globe")
-                                    .font(.system(size: 30))
-                                    .foregroundColor(Color(.quaternaryLabel))
-                            )
+                    // Snapshot preview
+                    Group {
+                        if let snapshot = tab.snapshot {
+                            Image(uiImage: snapshot)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                        } else {
+                            Rectangle()
+                                .fill(Color(.systemBackground))
+                                .overlay(
+                                    Image(systemName: "globe")
+                                        .font(.system(size: 30))
+                                        .foregroundColor(Color(.quaternaryLabel))
+                                )
+                        }
                     }
+                    .frame(height: 120)
+                    .clipped()
                 }
-                .frame(height: 120)
-                .clipped()
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(isActive ? Color.blue : Color.clear, lineWidth: 2)
+                )
+                .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
             }
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(isActive ? Color.blue : Color.clear, lineWidth: 2)
-            )
-            .shadow(color: .black.opacity(0.1), radius: 4, x: 0, y: 2)
+            .buttonStyle(.plain)
+
+            // Close button sits on top, outside the card Button's touch area
+            Button(action: onClose) {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.system(size: 20))
+                    .foregroundStyle(.white, Color(.systemGray3))
+                    .padding(6)
+            }
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
     }
 }
 
