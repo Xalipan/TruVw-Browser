@@ -104,23 +104,6 @@ struct SafariBottomBar: View {
                 .overlay(Capsule().strokeBorder(Color.white.opacity(0.18), lineWidth: 0.5))
                 .disabled(vm.currentURL == nil && !vm.isLoading)
 
-                // ── Tabs square ──────────────────────────────────────
-                Button { vm.showTabGrid = true } label: {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 5)
-                            .stroke(Color(.label), lineWidth: 1.7)
-                            .frame(width: 21, height: 21)
-                        Text("\(vm.tabManager.tabs.count)")
-                            .font(.system(
-                                size: vm.tabManager.tabs.count > 9 ? 9 : 11,
-                                weight: .bold, design: .rounded))
-                            .foregroundColor(Color(.label))
-                    }
-                    .frame(width: 48, height: 48)
-                }
-                .background(.ultraThinMaterial, in: Capsule())
-                .overlay(Capsule().strokeBorder(Color.white.opacity(0.18), lineWidth: 0.5))
-
                 // ── Ellipsis (more) ──────────────────────────────────
                 GlassBarButton(icon: "ellipsis", enabled: true) { showMenu = true }
                     .background(.ultraThinMaterial, in: Capsule())
@@ -172,18 +155,6 @@ struct SafariMenuSheet: View {
         NavigationView {
             List {
                 Section {
-                    LazyVGrid(
-                        columns: Array(repeating: GridItem(.flexible()), count: 4),
-                        spacing: 12
-                    ) {
-                        MenuIconButton(icon: "book",                   label: "Bookmarks")  { nav(.bookmarks) }
-                        MenuIconButton(icon: "clock.arrow.circlepath", label: "History")    { nav(.history) }
-                        MenuIconButton(icon: "arrow.down.circle",      label: "Downloads")  { nav(.downloads) }
-                        MenuIconButton(icon: "square.on.square",       label: "All Tabs")   { navTabs() }
-                    }
-                    .padding(.vertical, 6)
-                }
-                Section {
                     MenuRow(icon: "square.and.arrow.up", label: "Share…") {
                         close { showShareSheet = true }
                     }
@@ -201,6 +172,14 @@ struct SafariMenuSheet: View {
                     MenuRow(icon: "arrow.clockwise", label: "Reload") {
                         vm.reload(); isPresented = false
                     }
+                }
+                Section {
+                    MenuRow(icon: "book", label: "Bookmarks") { nav(.bookmarks) }
+                    MenuRow(icon: "clock.arrow.circlepath", label: "History") { nav(.history) }
+                    MenuRow(icon: "arrow.down.circle", label: "Downloads") { nav(.downloads) }
+                    MenuRow(icon: "square.on.square", label: "All Tabs") { navTabs() }
+                }
+                Section {
                     MenuRow(icon: "gearshape", label: "Settings") {
                         close { vm.activeSheet = .settings }
                     }
