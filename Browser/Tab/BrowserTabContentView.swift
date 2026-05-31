@@ -58,7 +58,8 @@ private extension BrowserTabContentView {
     addSubview(webView)
     webView.snp.makeConstraints {
       $0.top.equalTo(safeAreaLayoutGuide)
-      $0.leading.bottom.trailing.equalToSuperview()
+      $0.leading.trailing.equalToSuperview()
+      $0.bottom.equalTo(safeAreaLayoutGuide).inset(100)
     }
   }
   
