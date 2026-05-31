@@ -118,10 +118,7 @@ extension BrowserTabViewController: WKNavigationDelegate {
     }
     decisionHandler(.allow)
   }
-}
 
-
-extension BrowserTabViewController {
   func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
     guard let url = webView.url else { return }
     let rules = ConfigManager.shared.matchingRules(for: url)
