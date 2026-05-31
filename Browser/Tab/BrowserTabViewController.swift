@@ -20,7 +20,7 @@ class BrowserTabViewController: UIViewController {
   private let contentView = BrowserTabContentView()
   private var isScrolling = false
   private var startYOffset = CGFloat(0)
-  private var loadingProgressObservation: NSKeyValueObservation?
+  private var kvoObservations: [NSKeyValueObservation] = []
   var hasLoadedUrl = false
   weak var delegate: BrowserTabViewControllerDelegate?
   
@@ -36,21 +36,6 @@ class BrowserTabViewController: UIViewController {
   override func viewDidLoad() {
     super.viewDidLoad()
     setupWebView()
-  }
-  
-  override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-    switch keyPath {
-    case #keyPath(WKWebView.url):
-      delegate?.tabViewController(self, didStartLoadingURL: contentView.webView.url!)
-    case #keyPath(WKWebView.estimatedProgress):
-      delegate?.tabViewController(self, didChangeLoadingProgressTo: Float(contentView.webView.estimatedProgress))
-    case #keyPath(WKWebView.themeColor):
-      updateStatusBarColor()
-    case #keyPath(WKWebView.underPageBackgroundColor):
-      updateStatusBarColor()
-    default:
-      break
-    }
   }
   
   func loadWebsite(from url: URL) {
@@ -78,10 +63,23 @@ private extension BrowserTabViewController {
   func setupWebView() {
     contentView.webView.scrollView.panGestureRecognizer.addTarget(self, action: #selector(handlePan(_:)))
     contentView.webView.navigationDelegate = self
-    contentView.webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
-    contentView.webView.addObserver(self, forKeyPath: #keyPath(WKWebView.url), options: .new, context: nil)
-    contentView.webView.addObserver(self, forKeyPath: #keyPath(WKWebView.themeColor), options: .new, context: nil)
-    contentView.webView.addObserver(self, forKeyPath: #keyPath(WKWebView.underPageBackgroundColor), options: .new, context: nil)
+
+    kvoObservations = [
+      contentView.webView.observe(\.url, options: .new) { [weak self] webView, _ in
+        guard let self = self, let url = webView.url else { return }
+        self.delegate?.tabViewController(self, didStartLoadingURL: url)
+      },
+      contentView.webView.observe(\.estimatedProgress, options: .new) { [weak self] webView, _ in
+        guard let self = self else { return }
+        self.delegate?.tabViewController(self, didChangeLoadingProgressTo: Float(webView.estimatedProgress))
+      },
+      contentView.webView.observe(\.themeColor, options: .new) { [weak self] _, _ in
+        self?.updateStatusBarColor()
+      },
+      contentView.webView.observe(\.underPageBackgroundColor, options: .new) { [weak self] _, _ in
+        self?.updateStatusBarColor()
+      }
+    ]
   }
   
   func updateStatusBarColor() {
