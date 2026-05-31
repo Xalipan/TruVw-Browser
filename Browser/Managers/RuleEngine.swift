@@ -76,7 +76,7 @@ class RuleEngine {
         """ : ""
 
         let wrappedHTML = """
-            <div id="__truvw_banner_\(Int.random(in: 1000...9999))" style="\(defaultStyle)">
+            <div id="__truvw_banner" style="\(defaultStyle)">
                 <div style="flex:1">\(html)</div>
                 \(dismissButton)
             </div>
