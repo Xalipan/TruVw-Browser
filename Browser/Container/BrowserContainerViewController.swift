@@ -148,6 +148,7 @@ private extension BrowserContainerViewController {
     setupExpandingToolbarAnimator()
     expandingToolbarAnimator?.startAnimation()
     isCollapsed = false
+    currentAddressBar.textField.becomeFirstResponder()
   }
 }
 
