@@ -15,12 +15,12 @@ class URLGenerator {
   }
   
   func getURL(for text: String) -> URL? {
-    let text = text.lowercased()
-    guard urlValidator.isValidURL(text) else {
+    guard urlValidator.isValidURL(text.lowercased()) else {
       return getGoogleSearchURL(for: text)
     }
     
-    guard text.hasPrefix("http://") || text.hasPrefix("https://") else {
+    let lowercased = text.lowercased()
+    guard lowercased.hasPrefix("http://") || lowercased.hasPrefix("https://") else {
       return URL(string: "http://\(text)")
     }
     
